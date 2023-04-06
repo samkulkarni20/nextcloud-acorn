@@ -1,0 +1,54 @@
+containers: {
+  nextcloud: {
+    image: "nextcloud:apache"
+    env: {
+      "MYSQL_HOST": "mysql"
+      "MYSQL_DATABASE": "nextcloud"
+      "MYSQL_USER": "nextcloud"
+      "MYSQL_PASSWORD": "secret://mysql-password/token"
+      "NEXTCLOUD_TRUSTED_DOMAINS": "nextcloud.sameerkulkarni.in"
+      "PHP_UPLOAD_LIMIT": "1G"
+    }
+    dirs: {
+      "/var/www/html/data": "volume://nextcloud-pvc-nfs-data?subpath=data"
+      "/var/www/html/config": "volume://nextcloud-pvc-nfs-data?subpath=config"
+    }
+    dependsOn: ["mysql"]
+    ports: publish: "80/http"
+  }
+  mysql: {
+    image: "mariadb:10.7"
+    env: {
+      "MYSQL_DATABASE": "nextcloud"
+      "MYSQL_USER": "nextcloud"
+      "MYSQL_ROOT_PASSWORD": "secret://mysql-root-password/token"
+      "MYSQL_PASSWORD": "secret://mysql-password/token"
+    }
+    dirs: {
+      "/var/lib/mysql": "volume://nextcloud-pv-nfs-dbdata?subpath=dbdata"
+    }
+    ports: "3306/tcp"
+  }
+}
+
+secrets: {
+  "mysql-root-password": {
+    type: "token"
+  }
+  "mysql-password": {
+    type: "token"
+  }
+}
+
+volumes: {
+  "nextcloud-pvc-nfs-data": {
+    size: 100G
+    class: "nfs-nextcloud-data"
+    accessModes: "readWriteOnce"
+  }
+  "nextcloud-pv-nfs-dbdata": {
+    size: 4G
+    class: "nfs-nextcloud-dbdata"
+    accessModes: "readWriteOnce"
+  }
+}

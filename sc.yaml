@@ -1,0 +1,19 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-nextcloud-data
+provisioner: example.com/external-nfs
+parameters:
+  server: NFS_SERVER_IP                        # < IP address of your NFS server
+  path: NEXTCLOUD_DATA_NFS_PATH           # < NFS share path on the server
+  readOnly: "false"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-nextcloud-dbdata
+provisioner: example.com/external-nfs
+parameters:
+  server: NFS_SERVER_IP                        # < IP address of your NFS server
+  path: NEXTCLOUD_DBDATA_NFS_PATH        # < NFS share path on the server
+  readOnly: "false"
